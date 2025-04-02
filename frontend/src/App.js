@@ -4,6 +4,7 @@ import axios from "axios";
 function App() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const API_URL = process.env.REACT_APP_API_BASE_URL;
 
   const handleFileChange = (e) => {
     setFiles(Array.from(e.target.files));
@@ -17,7 +18,7 @@ function App() {
     files.forEach((file) => formData.append("files", file));
 
     try {
-      const response = await axios.post("http://localhost:5000/api/crop-multiple", formData, {
+      const response = await axios.post(`${API_URL}/api/crop-multiple`, formData, {
         responseType: "blob"
       });
 
