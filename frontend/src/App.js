@@ -2,51 +2,43 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function App() {
-  const [file, setFile] = useState(null);
-  const [croppedImage, setCroppedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState([]);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setCroppedImage(null);
+    setFiles(Array.from(e.target.files));
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!files.length) return;
 
     const formData = new FormData();
-    formData.append("file", file);
-    setLoading(true);
+    files.forEach((file) => formData.append("files", file));
 
     try {
-      const response = await axios.post("http://localhost:5000/api/crop", formData, {
-        responseType: "blob",
+      const response = await axios.post("http://localhost:5000/api/crop-multiple", formData, {
+        responseType: "blob"
       });
-      const imageUrl = URL.createObjectURL(response.data);
-      setCroppedImage(imageUrl);
+
+      const blob = new Blob([response.data], { type: "application/zip" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cropped_documents.zip";
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      alert("Document cropping failed.");
-    } finally {
-      setLoading(false);
+      alert("Cropping failed. Make sure the images have dark backgrounds and light content.");
     }
   };
 
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h2>Document Cropper</h2>
-      <input type="file" onChange={handleFileChange} />
+      <h2>Multi-Document Cropper</h2>
+      <input type="file" accept=".jpg, .zip" multiple onChange={handleFileChange} />
       <button onClick={handleUpload} style={{ marginTop: "1rem" }}>
-        Upload & Crop
+        Upload & Crop All
       </button>
-
-      {loading && <p>Processing...</p>}
-
-      {croppedImage && (
-        <div>
-          <h3>Result:</h3>
-          <img src={croppedImage} alt="Cropped Document" style={{ maxWidth: "100%" }} />
-        </div>
-      )}
     </div>
   );
 }
