@@ -104,7 +104,7 @@ function App() {
         alt="Crop Wizard"
         style={{
           position: "fixed",
-          bottom: 0,
+          bottom: "-13px",
           right: 0,
           width: "480px", // 3x bigger
           animation: "float 3s ease-in-out infinite",
@@ -117,8 +117,8 @@ function App() {
       <div
         style={{
           position: "fixed",
-          bottom: "160px",
-          right: "500px", // next to wizard
+          bottom: "330px",
+          right: "360px", // next to wizard
           backgroundColor: "#fff",
           padding: "0.75rem 1rem",
           borderRadius: "12px",
