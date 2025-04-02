@@ -107,7 +107,7 @@ function App() {
           position: "fixed",
           bottom: "-13px",
           right: 0,
-          width: "480px", // 3x bigger
+          width: "30vw", // 3x bigger
           animation: "float 3s ease-in-out infinite",
           pointerEvents: "none",
           zIndex: 1,
