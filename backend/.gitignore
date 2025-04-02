@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Temp image files
+temp_input.jpg
+temp_output.jpg
+
+# Example images
+example.jpg
+example2.jpg
+
+# Logs or debug files
+*.log
