@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
+import "./App.css";
+import Wizard from "./components/Wizard";
 
 function App() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
   const API_URL = process.env.REACT_APP_API_BASE_URL;
 
   const handleFileChange = (e) => {
     setFiles(Array.from(e.target.files));
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    setFiles(Array.from(e.dataTransfer.files));
   };
 
   const handleUpload = async () => {
@@ -38,40 +58,45 @@ function App() {
   };
 
   return (
-    <div
-      style={{
-        padding: "2rem",
-        fontFamily: "Comic Sans MS, sans-serif",
-        textAlign: "center",
-        background: "#f5f7fa",
-        minHeight: "100vh",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <h1 style={{ fontSize: "2.5rem", color: "#333" }}>
+    <div className="App">
+      <h1 className="title">
         🪄 Magischer Dokumenten Cropper
       </h1>
-      <p style={{ fontSize: "1.1rem", color: "#666" }}>
+      <p className="subtitle">
         JPGs im .zip-Archiv hochladen und dann das Tool zaubern lassen!
       </p>
   
-      <input
-        type="file"
-        accept=".jpg, .zip"
-        multiple
-        onChange={handleFileChange}
-        style={{
-          margin: "1rem auto",
-          display: "block",
-          fontSize: "1rem",
-        }}
-      />
+      <div className="file-input-container">
+        <label 
+          className={`file-input-label ${isDragging ? 'drag-active' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="file-input-icon">📁</div>
+          <div className="file-input-text">
+            {files.length > 0 
+              ? `${files.length} Datei${files.length > 1 ? 'en' : ''} ausgewählt`
+              : 'Dateien hierher ziehen oder klicken zum Auswählen'}
+          </div>
+          <div className="file-input-hint">
+            Unterstützte Formate: JPG, ZIP
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".jpg, .zip"
+            multiple
+            onChange={handleFileChange}
+            className="file-input"
+          />
+        </label>
+      </div>
   
       {files.length > 0 && (
-        <div style={{ marginBottom: "1rem" }}>
-          <p>📂 You’re uploading:</p>
-          <ul style={{ listStyle: "none", padding: 0 }}>
+        <div className="file-list">
+          <p>📂 Ausgewählte Dateien:</p>
+          <ul>
             {files.map((file, i) => (
               <li key={i}>🖼️ {file.name}</li>
             ))}
@@ -80,79 +105,20 @@ function App() {
       )}
   
       <button
+        className="upload-button"
         onClick={handleUpload}
-        disabled={loading}
-        style={{
-          background: "linear-gradient(135deg, #ff7eb3, #ff758c)",
-          color: "white",
-          border: "none",
-          padding: "0.75rem 1.5rem",
-          fontSize: "1rem",
-          borderRadius: "12px",
-          cursor: "pointer",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          transition: "transform 0.2s ease-in-out",
-        }}
-        onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-        onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
+        disabled={loading || !files.length}
       >
         {loading ? "🌀 Dein Zauber wird vorbereitet..." : "🌈 Upload & Crop All"}
       </button>
   
-      {/* Floating friend character */}
-      <img
-        src="/wizard-friend.png"
-        alt="Crop Wizard"
-        style={{
-          position: "fixed",
-          bottom: "-13px",
-          right: 0,
-          width: "30vw", // 3x bigger
-          animation: "float 3s ease-in-out infinite",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      />
-
-      {/* Funny speech bubble */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "330px",
-          right: "360px", // next to wizard
-          backgroundColor: "#fff",
-          padding: "0.75rem 1rem",
-          borderRadius: "12px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          fontSize: "0.95rem",
-          maxWidth: "220px",
-          transform: "rotate(-2deg)",
-          zIndex: 2,
-        }}
-      >
-        {loading
-          ? "⚡ Hokus Pokus, ich schneid den Kram zusammen..."
-          : "Ich bin der Crop-Wizard. Gib mir was zum Schnippeln!"}
-      </div>
-
+      <Wizard loading={loading} />
   
-      <footer style={{ marginTop: "4rem", fontSize: "0.9rem", color: "#aaa" }}>
+      <footer className="footer">
         Idee und Entwicklung von der KommuneDigitalSolutions GmbH und Co. KG
       </footer>
-  
-      {/* Floating animation keyframes */}
-      <style>
-        {`
-          @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-            100% { transform: translateY(0); }
-          }
-        `}
-      </style>
     </div>
   );
-  
 }
 
 export default App;
